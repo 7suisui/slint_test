@@ -1,17 +1,96 @@
+component Renderer inherits Rectangle {
+    background: is_show ? #d89e9e : @linear-gradient(180deg, #2e69ad 0%, #d89e9e 100%);
+    border-radius: 10px;
+    opacity: touch.pressed ? 0.7 : 1.0;
+    animate opacity {
+        duration: 100ms;
+        easing: ease-out;
+    }
+    skn := Image {
+        x: 10px;
+        visible: icon != @image-url("");
+    }
+
+    txt := Text {
+        x: 55px;
+        font-size: 22px;
+        color: #b30b80;
+    }
+
+    touch := TouchArea { }
+
+    in-out property <bool> is_show;
+    in-out property <image> icon <=> skn.source;
+    in-out property <string> text <=> txt.text;
+    callback clicked <=> touch.clicked;
+}
+
 export component AppWindow inherits Window {
     width: 480px;
     height: 480px;
-    background: red;
+    background: #063344;
 
     Rectangle {
-        y: 150px;
-        width: 130px;
-        height: 25px;
-        background: #fff;
-        border-radius: 10px;
+        x: 20px;
+        y: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: self.width / 2;
+        background: #00000000;
+        border-width: 2px;
+        border-color: #000;
+        clip: true;
+
+        img := Image {
+            width: parent.width;
+            height: parent.height;
+            source: @image-url("./assets/com_img_idle0.png");
+        }
     }
 
     Image {
-        source: @image-url("./assets/home_img_add.png");
+        x: (parent.width - self.preferred-width) / 2;
+        y: 20px;
+        width: 50px;
+        height: 50px;
+        source: @image-url("./assets/slint_logo.png");
+        rotation-angle: 360deg * animation-tick() / 2s;
     }
+
+    Image {
+        x: parent.width - (self.width + 20px);
+        y: 20px;
+        width: 50px;
+        height: 50px;
+        source: @image-url("./assets/test_img_add.png");
+    }
+
+    Flickable {
+        y: 160px;
+        width: 440px;
+        height: (70px + 5px) * 4 - 5px;
+
+        VerticalLayout {
+            spacing: 5px;
+
+            for data[index] in setting_menu: Renderer {
+                width: 440px;
+                height: 70px;
+                icon: data.icon;
+                text: data.name;
+                is_show: Math.mod(index, 2) == 0;
+            }
+        }
+    }
+
+    out property <[{id: string, name: string, icon: image}]> setting_menu: 
+    [
+        { id: "1", name:"grade", icon: @image-url("./assets/test_img_icon1.png") },
+        { id: "2", name:"more", icon: @image-url("./assets/test_img_icon2.png") },
+        { id: "3", name:"notice", icon: @image-url("./assets/test_img_icon3.png") },
+        { id: "4", name:"evaluate", icon: @image-url("./assets/test_img_icon4.png") },
+        { id: "5", name:"card", icon: @image-url("./assets/test_img_icon5.png") },
+        { id: "6", name:"statistics", icon: @image-url("./assets/test_img_icon6.png") },
+        { id: "7", name:"news", icon: @image-url("./assets/test_img_icon7.png") },
+    ];
 }
